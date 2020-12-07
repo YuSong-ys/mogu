@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <Nuxt />
+  <div v-cloak>
+    <Nuxt keep-alive />
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 export default {
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
-    title: 'mogu',
+    title: '首页',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -14,11 +14,13 @@ export default {
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
+    '@/assets/css/base.css',
     'vant/lib/index.css'
   ],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
+    { src: '~/api', ssr: true },
     { src: '~/plugins/vant', ssr: true }
   ],
 
@@ -37,5 +39,20 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
+    extend (config, ctx) {
+      config.module.rules.push({
+        test: /\.less$/,
+        use: [
+          {
+            loader: 'less-loader',
+            options: {
+              modifyVars: {
+                '@nav-bar-background-color': '#ff5722'
+              }
+            }
+          }
+        ]
+      })
+    }
   }
 }
