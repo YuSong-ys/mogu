@@ -5,20 +5,21 @@
       success-text="刷新成功"
       @refresh="onRefresh"
     >
-      <van-nav-bar fixed>
+      <!-- tabBar -->
+      <van-nav-bar fixed :title="goodsInfo.title">
         <template #left>
           <van-icon name="arrow-left" color="#000" size="18px" @click="back" />
         </template>
-        <template #title>
-          <span
-            v-for="(item,index) in tabBarTitle"
-            :key="index"
-            style="margin: 0 10px;fons-size:14px;"
-            :class="{active : index === currentTitle}"
-            @click="clickTitle(index)"
-          >{{ item }}</span>
+        <template #right>
+          <van-icon name="ellipsis" color="#000" size="25px" @click="showShare=true" />
         </template>
       </van-nav-bar>
+      <van-share-sheet
+        v-model="showShare"
+        title="立即分享给好友"
+        :options="options"
+        @select="onSelect"
+      />
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
         <van-swipe-item v-for="(item,index) in topImages" :key="index">
           <van-image :src="item" height="300px" fit="none" />
@@ -87,6 +88,28 @@
         </div>
       </div>
       <van-divider />
+      <!-- 用户评论 -->
+      <div v-if="hasCommentInfo" class="userComment">
+        <van-cell-group>
+          <van-cell title="用户评价" value="更多" is-link />
+        </van-cell-group>
+        <div class="userInfo">
+          <van-image :src="commentInfo.user.avatar" round width="45px" height="45px" />
+          <span>{{ commentInfo.user.uname }}</span>
+        </div>
+        <div class="infoDetail">
+          {{ commentInfo.content }}
+        </div>
+        <div class="infoOther">
+          <span class="infoDate">
+            {{ commentInfo.created | showData }}
+          </span>
+          <span class="infoStyle">
+            {{ commentInfo.style }}
+          </span>
+        </div>
+        <van-divider />
+      </div>
       <!-- 商品详情信息 -->
       <div class="detailInfo">
         <div class="desc">
@@ -127,28 +150,6 @@
         <div v-if="paramInfo.image" class="info-img">
           <img :src="paramInfo.image" alt="">
         </div>
-      </div>
-      <!-- 用户评论 -->
-      <div v-if="hasCommentInfo" class="userComment">
-        <van-cell-group>
-          <van-cell title="用户评价" value="更多" is-link />
-        </van-cell-group>
-        <div class="userInfo">
-          <van-image :src="commentInfo.user.avatar" round width="45px" height="45px" />
-          <span>{{ commentInfo.user.uname }}</span>
-        </div>
-        <div class="infoDetail">
-          {{ commentInfo.content }}
-        </div>
-        <div class="infoOther">
-          <span class="infoDate">
-            {{ commentInfo.created | showData }}
-          </span>
-          <span class="infoStyle">
-            {{ commentInfo.style }}
-          </span>
-        </div>
-        <van-divider />
       </div>
       <!-- 商品推荐 -->
       <goods-list :goods="recommends" />
@@ -194,7 +195,15 @@ export default {
       commentInfo: { user: {} },
       recommends: [],
       isLoading: false,
-      hasCommentInfo: true
+      hasCommentInfo: true,
+      showShare: false,
+      options: [
+        { name: '微信', icon: 'wechat' },
+        { name: '微博', icon: 'weibo' },
+        { name: '复制链接', icon: 'link' },
+        { name: '分享海报', icon: 'poster' },
+        { name: '二维码', icon: 'qrcode' }
+      ]
     }
   },
   created () {
@@ -227,6 +236,10 @@ export default {
       setTimeout(() => {
         this.isLoading = false
       }, 1000)
+    },
+    onSelect (option) {
+      this.$toast(option.name)
+      this.showShare = false
     },
     back () {
       this.$router.go(-1)
