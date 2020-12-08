@@ -10,7 +10,7 @@
           <span @click="onClickRight">{{ isShow ? '管理' : "完成" }}</span>
         </template>
       </van-nav-bar>
-      <cart-product :is-show="isShow" />
+      <cart-product :is-show="isShow" @changeShow="changeShow" />
     </van-pull-refresh>
     <main-tab-bar />
   </div>
@@ -33,6 +33,10 @@ export default {
     }
   },
   methods: {
+    // 子组件删除或清空购物车后改回管理
+    changeShow () {
+      this.isShow = true
+    },
     onRefresh () {
       this.isLoading = true
       setTimeout(() => {

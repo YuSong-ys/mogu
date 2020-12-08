@@ -61,7 +61,7 @@ export default {
   },
   data () {
     return {
-      checked: true
+      checked: false
     }
   },
   computed: {
@@ -81,6 +81,10 @@ export default {
       return total
     }
   },
+  activated () {
+    if (!this.proList.length) { return }
+    this.checked = this.proList.every(item => item.isChecked)
+  },
   methods: {
     ...mapMutations({
       updataProduct: 'updataProduct'
@@ -88,18 +92,38 @@ export default {
     onSubmit () {
       this.$toast('该功能暂未开放')
     },
+    // 商品增加
     addNum (item) {
       this.$store.commit('addProductNum', item)
     },
+    // 商品减少
     deNum (item) {
       if (item.num > 1) {
         this.$store.commit('deProductNum', item)
       }
     },
+    // 删除商品
     deletePro (item) {
       this.$store.commit('deleteProduct', item)
+      if (!this.proList.length) {
+        this.checked = false
+      }
     },
+    // 批量删除商品
     deleteSome () {
+      let flag = false
+      for (let i = 0; i < this.proList.length; i++) {
+        if (!this.proList[i].isChecked) {
+          flag = true
+        } else {
+          flag = false
+          break
+        }
+      }
+      if (flag) {
+        this.$toast('您还没有选择商品')
+        return
+      }
       if (this.proList.length) {
         this.$dialog.confirm({
           title: '删除',
@@ -108,6 +132,7 @@ export default {
           .then(() => {
             this.$store.commit('deleteChooses')
             this.$toast('删除成功')
+            this.$emit('changeShow')
             if (!this.proList.length) {
               this.checked = false
             }
@@ -115,8 +140,11 @@ export default {
           .catch(() => {
             this.$toast('已取消')
           })
+      } else {
+        this.$toast('购物车没有商品')
       }
     },
+    // 清空购物车
     deleteAll () {
       if (this.proList.length) {
         this.$dialog.confirm({
@@ -127,23 +155,22 @@ export default {
             this.checked = false
             this.$store.commit('deleteAll')
             this.$toast('购物车已清空')
+            this.$emit('changeShow')
           })
           .catch(() => {
             this.$toast('已取消')
           })
+      } else {
+        this.$toast('购物车没有商品')
       }
     },
+    // 全选
     checkAll () {
       this.$store.commit('updateAllChecked', this.checked)
     },
+    // 商品单选联动全选
     updataInfo (item) {
       this.$store.commit('updateChecked', item)
-      this.checked = this.proList.every(item => item.isChecked)
-    }
-  },
-  // eslint-disable-next-line vue/order-in-components
-  beforeUpdated () {
-    if (this.proList.length) {
       this.checked = this.proList.every(item => item.isChecked)
     }
   }
