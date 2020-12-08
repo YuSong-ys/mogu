@@ -24,7 +24,8 @@
     </van-grid>
     <div class="feature">
       <a href="https://act.mogujie.com/zzlx67">
-        <img src="../assets/img/home/recommend_bg.jpg" alt="" width="100%" style="margin-top:8px"></a>
+        <img src="../assets/img/home/recommend_bg.jpg" alt="" width="100%" style="margin-top:8px">
+      </a>
     </div>
     <van-tabs v-model="active" sticky @click="tabClick">
       <van-tab v-for="(item,index) in tabList" :key="index" :title="item.tab" :name="item.name">

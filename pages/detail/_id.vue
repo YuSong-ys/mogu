@@ -157,14 +157,15 @@
     <back-top />
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
-      <van-goods-action-icon icon="cart-o" text="购物车" />
+      <van-goods-action-icon icon="cart-o" text="购物车" to="/cart" :badge="$store.state.proList.length" />
       <van-goods-action-icon icon="star-o" text="收藏" />
-      <van-goods-action-button type="warning" text="加入购物车" />
+      <van-goods-action-button type="warning" text="加入购物车" @click="addTocart" />
       <van-goods-action-button type="danger" text="立即购买" />
     </van-goods-action>
   </div>
 </template>
 <script>
+import { mapMutations, mapGetters } from 'vuex'
 import { getDetail, GoodsInfo, Shop, GoodsParam, getRecommend } from '~/api/detail'
 import GoodsList from '~/components/goods/GoodsList'
 import BackTop from '~/components/backTop/BackTop.vue'
@@ -206,6 +207,11 @@ export default {
       ]
     }
   },
+  computed: {
+    ...mapGetters({
+      proList: 'proList'
+    })
+  },
   created () {
     this.id = this.$route.params.id
     getDetail(this.id).then((res) => {
@@ -231,6 +237,29 @@ export default {
     })
   },
   methods: {
+    addTocart () {
+      const flag = this.proList.every(item => item.id !== this.id)
+      const productInfo = {
+        ...this.goodsInfo,
+        ...this.shopInfo,
+        id: this.id,
+        img: this.topImages[0],
+        num: 1,
+        isChecked: true,
+        price: this.goodsInfo.newPrice.replace(/¥/g, '').split('~')[0]
+
+      }
+      if (flag) {
+        this.$store.commit('addProduct', productInfo)
+        this.$toast('添加购物车成功')
+      } else {
+        this.$store.commit('addProductNum', productInfo)
+        this.$toast('商品数量+1')
+      }
+    },
+    ...mapMutations({
+      addProduct: 'addProduct'
+    }),
     onRefresh () {
       this.isLoading = true
       setTimeout(() => {
@@ -246,6 +275,11 @@ export default {
     },
     clickTitle (index) {
       this.currentTitle = index
+    }
+  },
+  head () {
+    return {
+      title: this.goodsInfo.title
     }
   }
 }
