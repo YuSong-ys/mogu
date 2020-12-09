@@ -155,12 +155,76 @@
       <goods-list :goods="recommends" />
     </van-pull-refresh>
     <back-top />
+    <van-popup v-model="showSku" round position="bottom" :style="{ height: 'auto' }">
+      <van-row type="flex" style="margin-top:20px">
+        <van-col span="7" offset="1">
+          <van-image width="90" height="90" :src="proImg" />
+        </van-col>
+        <van-col span="14" style="margin-top:20px">
+          <div class="price">
+            ￥<span style="font-size:24px;color:#f00;">{{ price / 100 }}</span>
+          </div>
+          <div class="stock">
+            库存 {{ stock }}
+          </div>
+          <div class="chooses">
+            已选择 {{ chooseColor + ' ' + chooseSize }}
+          </div>
+        </van-col>
+      </van-row>
+      <van-divider />
+      <div class="colorTitle">
+        颜色:
+      </div>
+      <div v-if="ShoppingCartInfo.props" class="colors">
+        <div
+          v-for="(item,index) in ShoppingCartInfo.props[0].list"
+          :key="index"
+          class="colorItem"
+          :class="{'active': index === currentColor}"
+          @click="changeColor(index,item)"
+        >
+          {{ item.name }}
+        </div>
+      </div>
+      <van-divider />
+      <div class="colorTitle">
+        尺码:
+      </div>
+      <div v-if="ShoppingCartInfo.props" class="colors">
+        <div
+          v-for="(item,index) in ShoppingCartInfo.props[1].list"
+          :key="index"
+          class="colorItem"
+          :class="{'active': index === currentSize}"
+          @click="changeSize(index,item)"
+        >
+          {{ item.name }}
+        </div>
+      </div>
+      <van-divider />
+      <div class="buyNum">
+        <div class="buyTitle">
+          购买数量
+        </div>
+        <van-stepper v-model="buyNum" integer style="margin-right:20px" />
+      </div>
+      <van-button
+        round
+        type="danger"
+        size="small"
+        style="float: right;margin:10px 20px 5px 0;padding: 0 20px"
+        @click="addToCart"
+      >
+        加入购物车
+      </van-button>
+    </van-popup>
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
       <van-goods-action-icon icon="cart-o" text="购物车" to="/cart" :badge="$store.state.proList.length" />
       <van-goods-action-icon icon="star-o" text="收藏" />
-      <van-goods-action-button type="warning" text="加入购物车" @click="addTocart" />
-      <van-goods-action-button type="danger" text="立即购买" />
+      <van-goods-action-button type="warning" text="加入购物车" @click="showSku = true" />
+      <van-goods-action-button type="danger" text="立即购买" @click="showSku = true" />
     </van-goods-action>
   </div>
 </template>
@@ -195,9 +259,21 @@ export default {
       paramInfo: {},
       commentInfo: { user: {} },
       recommends: [],
+      ShoppingCartInfo: {},
       isLoading: false,
       hasCommentInfo: true,
       showShare: false,
+      showSku: false,
+      proImg: '',
+      price: 0,
+      stock: 0,
+      sizeId: 0,
+      styleId: 0,
+      currentColor: 0,
+      currentSize: 0,
+      chooseColor: '',
+      chooseSize: '',
+      buyNum: 1,
       options: [
         { name: '微信', icon: 'wechat' },
         { name: '微博', icon: 'weibo' },
@@ -222,6 +298,16 @@ export default {
       this.goodsInfo = new GoodsInfo(data.itemInfo, data.columns, data.shopInfo.services)
       // 店铺数据
       this.shopInfo = new Shop(data.shopInfo)
+      // 保存购物车信息
+      this.ShoppingCartInfo = data.skuInfo
+      this.xdSkuId = this.ShoppingCartInfo.skus[0].xdSkuId
+      this.chooseColor = this.ShoppingCartInfo.props[0].list[0].name
+      this.chooseSize = this.ShoppingCartInfo.props[1].list[0].name
+      this.styleId = this.ShoppingCartInfo.props[0].list[0].styleId
+      this.sizeId = this.ShoppingCartInfo.props[1].list[0].sizeId
+      this.stock = this.ShoppingCartInfo.skus[0].stock
+      this.price = this.ShoppingCartInfo.skus[0].price
+      this.proImg = this.ShoppingCartInfo.skus[0].img
       // 详情数据
       this.detailInfo = data.detailInfo || {}
       this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule)
@@ -237,25 +323,55 @@ export default {
     })
   },
   methods: {
-    addTocart () {
-      const flag = this.proList.every(item => item.id !== this.id)
+    changeColor (index, item) {
+      this.currentColor = index
+      this.chooseColor = item.name
+      this.styleId = item.styleId
+      const result = this.ShoppingCartInfo.skus.find(item => item.styleId === this.styleId && item.sizeId === this.sizeId)
+      this.proImg = result.img
+      this.stock = result.stock
+      this.price = result.price
+      this.xdSkuId = result.xdSkuId
+    },
+    changeSize (index, item) {
+      this.currentSize = index
+      this.chooseSize = item.name
+      this.sizeId = item.sizeId
+      const result = this.ShoppingCartInfo.skus.find(item => item.styleId === this.styleId && item.sizeId === this.sizeId)
+      this.proImg = result.img
+      this.stock = result.stock
+      this.price = result.price
+      this.xdSkuId = result.xdSkuId
+    },
+    addToCart () {
+      // const flag = this.proList.every((item) => {
+      //   return item.every(v => v.id !== this.xdSkuId)
+      // })
       const productInfo = {
-        ...this.goodsInfo,
-        ...this.shopInfo,
-        id: this.id,
-        img: this.topImages[0],
-        num: 1,
+        id: this.xdSkuId,
+        title: this.goodsInfo.title,
+        name: this.shopInfo.name,
+        img: this.proImg,
+        num: this.buyNum,
+        style: this.chooseColor,
+        size: this.chooseSize,
         isChecked: true,
-        price: this.goodsInfo.newPrice.replace(/¥/g, '').split('~')[0]
+        isShopChecked: true,
+        price: this.price / 100
 
       }
-      if (flag) {
-        this.$store.commit('addProduct', productInfo)
-        this.$toast('添加购物车成功')
-      } else {
-        this.$store.commit('addProductNum', productInfo)
-        this.$toast('商品数量+1')
-      }
+      // if (flag) {
+      this.$store.commit('addProduct', productInfo)
+      this.$toast('添加购物车成功')
+      this.showSku = false
+      this.buyNum = 1
+      // console.log(productInfo)
+      // } else {
+      //   this.$store.commit('addProductNum', productInfo)
+      //   this.$toast('商品数量+' + this.buyNum)
+      //   this.showSku = false
+      //   this.buyNum = 1
+      // }
     },
     ...mapMutations({
       addProduct: 'addProduct'
@@ -500,6 +616,37 @@ export default {
     .infoOther {
       font-size: 12px;
       color: #999;
+    }
+  }
+  .colorTitle,.buyNum {
+    margin-top: 10px;
+    margin-left: 20px;
+  }
+  .colors {
+    display: flex;
+    justify-content: start;
+    flex-wrap: wrap;
+    .colorItem {
+      margin-top: 10px;
+      margin-left: 20px;
+      // width: 100px;
+      border-radius: 5px;
+      background: #f5f5f5;
+      padding: 2px 7px;
+    }
+    .active {
+    background: pink;
+    color: red;
+  }
+  }
+  .buyNum {
+    display: flex;
+    justify-content: space-between;
+  }
+  .van-popup {
+    .stock,.chooses {
+      font-size: 14px;
+      margin-top: 5px;
     }
   }
 </style>

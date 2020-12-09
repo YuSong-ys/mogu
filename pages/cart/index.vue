@@ -1,17 +1,11 @@
 <template>
   <div class="container">
-    <van-pull-refresh
-      v-model="isLoading"
-      success-text="刷新成功"
-      @refresh="onRefresh"
-    >
-      <van-nav-bar title="购物车">
-        <template #right>
-          <span @click="onClickRight">{{ isShow ? '管理' : "完成" }}</span>
-        </template>
-      </van-nav-bar>
-      <cart-product :is-show="isShow" @changeShow="changeShow" />
-    </van-pull-refresh>
+    <van-nav-bar title="购物车">
+      <template #right>
+        <span @click="onClickRight">{{ isShow ? '管理' : "完成" }}</span>
+      </template>
+    </van-nav-bar>
+    <cart-product :is-show="isShow" @changeShow="changeShow" />
     <main-tab-bar />
   </div>
 </template>

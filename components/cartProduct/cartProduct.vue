@@ -1,33 +1,34 @@
 <template>
   <div class="container">
     <div class="products">
-      <div v-for="(item,index) in proList" :key="index" class="prolist">
-        <div class="shop">
-          <van-checkbox :value="item.isChecked" icon-size="16px" @click="updataInfo(item)" />
-          <span>{{ item.name }}</span>
-          <van-icon name="arrow" />
-        </div>
-        <div class="productInfo">
-          <van-checkbox :value="item.isChecked" icon-size="16px" @click="updataInfo(item)" />
-          <van-swipe-cell>
-            <van-card
-              :price="(item.price * item.num).toFixed(2)"
-              :desc="item.desc"
-              :title="item.title"
-              class="goods-card"
-              :thumb="item.img"
-            >
-              <template #num>
-                <!-- <van-stepper v-model="value" integer button-size="18px" @change="updataNum(item)" /> -->
-                <van-icon name="minus" color="#000" @click="deNum(item)" />
-                <span style="font-size:16px;color:#000;background:#e5e5e5;margin:0 7px">{{ item.num }}</span>
-                <van-icon name="plus" color="#000" @click="addNum(item)" />
+      <div v-for="(proItem,index) in proList" :key="index" class="prolist">
+        <div class="proListItem">
+          <div v-if="proItem[0]" class="shop">
+            <van-checkbox :value="proItem[0].isShopChecked" icon-size="16px" @click="updateShopChecked(proItem[0])" />
+            <span>{{ proItem[0].name }}</span>
+            <van-icon name="arrow" />
+          </div>
+          <div v-for="(item,i) in proItem" :key="i" class="productInfo">
+            <van-checkbox :value="item.isChecked" icon-size="16px" @click="updataInfo(item)" />
+            <van-swipe-cell>
+              <van-card
+                :price="(item.price * item.num).toFixed(2)"
+                :desc="'颜色:' + item.style + ' 尺码:' + item.size"
+                :title="item.title"
+                class="goods-card"
+                :thumb="item.img"
+              >
+                <template #num>
+                  <van-icon name="minus" color="#000" @click="deNum(item)" />
+                  <span style="font-size:16px;color:#000;background:#e5e5e5;margin:0 7px">{{ item.num }}</span>
+                  <van-icon name="plus" color="#000" @click="addNum(item)" />
+                </template>
+              </van-card>
+              <template #right>
+                <van-button square text="删除" type="danger" class="delete-button" @click="deletePro(item)" />
               </template>
-            </van-card>
-            <template #right>
-              <van-button square text="删除" type="danger" class="delete-button" @click="deletePro(item)" />
-            </template>
-          </van-swipe-cell>
+            </van-swipe-cell>
+          </div>
         </div>
       </div>
     </div>
@@ -61,7 +62,8 @@ export default {
   },
   data () {
     return {
-      checked: false
+      checked: false,
+      shopChecked: false
     }
   },
   computed: {
@@ -70,15 +72,33 @@ export default {
     }),
     totalPrice () {
       let total = 0
-      for (const key in this.proList) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (this.proList.hasOwnProperty(key)) {
-          if (this.proList[key].isChecked) {
-            total += this.proList[key].price * this.proList[key].num * 100
+      for (const item of this.proList) {
+        for (const v of item) {
+          if (v.isChecked) {
+            total += v.price * v.num * 100
           }
         }
       }
       return total
+    }
+  },
+  watch: {
+    proList: {
+      handler (oldValue, newValue) {
+        let flag = false
+        for (const v of newValue) {
+          for (const item of v) {
+            if (!item.isChecked) {
+              flag = false
+              break
+            } else {
+              flag = true
+            }
+          }
+        }
+        this.checked = flag
+      },
+      deep: true
     }
   },
   activated () {
@@ -107,6 +127,7 @@ export default {
       this.$store.commit('deleteProduct', item)
       if (!this.proList.length) {
         this.checked = false
+        this.$emit('changeShow')
       }
     },
     // 批量删除商品
@@ -168,8 +189,13 @@ export default {
     checkAll () {
       this.$store.commit('updateAllChecked', this.checked)
     },
-    // 商品单选联动全选
+    // 单一商店商品全选联动
+    updateShopChecked (payload) {
+      this.$store.commit('updateShopChecked', payload)
+    },
+    // 全部商品单选联动全选
     updataInfo (item) {
+      // console.log(item)
       this.$store.commit('updateChecked', item)
       this.checked = this.proList.every(item => item.isChecked)
     }
@@ -197,6 +223,7 @@ export default {
     height: 100%;
   }
 .productInfo {
+  margin-bottom: 10px;
     .van-checkbox {
         margin: 0 10px;
     }
@@ -210,7 +237,7 @@ export default {
     bottom: 50px;
 }
 .products {
-    margin-bottom: 50px;
+    margin-bottom: 100px;
 }
 .container {
     position: relative;
