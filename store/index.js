@@ -3,12 +3,27 @@ export const state = () => ({
   isCheckedAll: true
 })
 
+// 控制全选的方法抽离
+const checkedAll = function (state) {
+  let checked = false
+  for (const v of state.proList) {
+    if (!v[0].isShopChecked) {
+      checked = false
+      break
+    } else {
+      checked = true
+    }
+  }
+  state.isCheckedAll = checked
+}
+
 export const mutations = {
   // 添加商品
   addProduct (state, obj) {
     // 没有商品，直接添加新数组
     if (!state.proList.length) {
       state.proList.push([obj])
+      checkedAll(state)
       return
     }
     let hasAim = false
@@ -27,7 +42,10 @@ export const mutations = {
     } else {
       state.proList.push([obj])
     }
+    // 控制全选
+    checkedAll(state)
   },
+
   // 增加商品数量
   addProductNum (state, payload) {
     let sameProduct = []
@@ -39,6 +57,7 @@ export const mutations = {
     }
     sameProduct.num += payload.num
   },
+
   // 减少商品数量
   deProductNum (state, payload) {
     let sameProduct = []
@@ -50,10 +69,10 @@ export const mutations = {
     }
     sameProduct.num--
   },
-  // 删除商品
+
+  // 删除单个商品
   deleteProduct (state, payload) {
     let hasAim = false
-    let checked = false
     let checkShopAll = false
     let sameProduct = []
     let index = 0
@@ -82,18 +101,13 @@ export const mutations = {
         checkShopAll = true
       }
     }
-    sameProduct[0].isShopChecked = checkShopAll
-    // 控制全选
-    for (const v of state.proList) {
-      if (!v[0].isShopChecked) {
-        checked = false
-        break
-      } else {
-        checked = true
-      }
+    if (sameProduct[0]) {
+      sameProduct[0].isShopChecked = checkShopAll
     }
-    state.isCheckedAll = checked
+    // 控制全选
+    checkedAll(state)
   },
+
   // 删除选中商品
   deleteChooses (state) {
     for (let i = 0; i < state.proList.length; i++) {
@@ -107,17 +121,19 @@ export const mutations = {
       }
     }
   },
+
   // 删除所有商品
   deleteAll (state) {
     state.proList = []
+    state.isCheckedAll = false
   },
+
   /**
    * 更新商品中Checked的值
    */
   updateChecked (state, payload) {
     let hasAim = false
     let checkShopAll = false
-    let checked = false
     let sameProduct = []
     let index = 0
     // 改变点击的
@@ -140,21 +156,13 @@ export const mutations = {
     }
     sameProduct[0].isShopChecked = checkShopAll
     // 控制全选
-    for (const v of state.proList) {
-      if (!v[0].isShopChecked) {
-        checked = false
-        break
-      } else {
-        checked = true
-      }
-    }
-    state.isCheckedAll = checked
+    checkedAll(state)
   },
+
   /**
    *  单一商店商品全选联动
    */
   updateShopChecked (state, payload) {
-    let checked = false
     for (const v of state.proList) {
       if (v[0].name === payload.name) {
         v.map((item) => {
@@ -164,16 +172,9 @@ export const mutations = {
       }
     }
     // 控制全选
-    for (const v of state.proList) {
-      if (!v[0].isShopChecked) {
-        checked = false
-        break
-      } else {
-        checked = true
-      }
-    }
-    state.isCheckedAll = checked
+    checkedAll(state)
   },
+
   /**
    * 更新全部商品中Checked的值
    */
