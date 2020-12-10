@@ -3,11 +3,6 @@
     <van-nav-bar
       title="商品分类"
     />
-    <!-- <van-sidebar v-model="activeKey">
-      <van-sidebar-item v-for="(item,index) in categoryList" :key="index" :title="item.title" @click="changeCategory(item)">
-        111
-      </van-sidebar-item>
-    </van-sidebar> -->
     <div class="category">
       <div class="categoryLeft">
         <div

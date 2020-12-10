@@ -53,6 +53,8 @@ export const mutations = {
   // 删除商品
   deleteProduct (state, payload) {
     let hasAim = false
+    let checked = false
+    let checkShopAll = false
     let sameProduct = []
     let index = 0
     for (let i = 0; i < state.proList.length; i++) {
@@ -71,6 +73,26 @@ export const mutations = {
         i -= 1
       }
     }
+    // 改变点击的按钮对应的店铺
+    for (const v of sameProduct) {
+      if (!v.isChecked) {
+        checkShopAll = false
+        break
+      } else {
+        checkShopAll = true
+      }
+    }
+    sameProduct[0].isShopChecked = checkShopAll
+    // 控制全选
+    for (const v of state.proList) {
+      if (!v[0].isShopChecked) {
+        checked = false
+        break
+      } else {
+        checked = true
+      }
+    }
+    state.isCheckedAll = checked
   },
   // 删除选中商品
   deleteChooses (state) {
@@ -94,7 +116,7 @@ export const mutations = {
    */
   updateChecked (state, payload) {
     let hasAim = false
-    let checkAll = false
+    let checkShopAll = false
     let checked = false
     let sameProduct = []
     let index = 0
@@ -110,13 +132,13 @@ export const mutations = {
     // 改变点击的按钮对应的店铺
     for (const v of sameProduct) {
       if (!v.isChecked) {
-        checkAll = false
+        checkShopAll = false
         break
       } else {
-        checkAll = true
+        checkShopAll = true
       }
     }
-    sameProduct[0].isShopChecked = checkAll
+    sameProduct[0].isShopChecked = checkShopAll
     // 控制全选
     for (const v of state.proList) {
       if (!v[0].isShopChecked) {
