@@ -39,6 +39,7 @@ export class GoodsInfo {
  */
 export class Shop {
   constructor (shopInfo) {
+    this.shopId = shopInfo.shopId
     this.logo = shopInfo.shopLogo
     this.name = shopInfo.name
     this.fans = shopInfo.cFans

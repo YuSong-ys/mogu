@@ -59,7 +59,9 @@ export default {
     //   this.$bus.$emit('itemImageLoad')
     // },
     itemClick () {
-      this.$router.push({ name: 'detail-id', params: { id: this.goodsItem.iid } })
+      if (this.goodsItem.iid) {
+        this.$router.push({ name: 'detail-id', params: { id: this.goodsItem.iid } })
+      }
     }
   }
 }

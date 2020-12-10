@@ -63,7 +63,7 @@
                 {{ (shopInfo.sells / 10000).toFixed(2) }} 万
               </div>
               <div class="txt">
-                总销量
+                <span>总销量</span>
               </div>
             </div>
             <div class="goodsCount">
@@ -71,7 +71,7 @@
                 {{ shopInfo.goodsCount }}
               </div>
               <div class="txt">
-                全部宝贝
+                <span>全部宝贝</span>
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@
           <div class="end" />
         </div>
         <div class="infoKey">
-          穿着效果
+          <span>穿着效果</span>
         </div>
         <div v-if="detailInfo.detailImage" class="detailImg">
           <van-image v-for="(item, index) in detailInfo.detailImage[0].list" :key="index" :src="item" />
@@ -129,22 +129,26 @@
       <!-- 商品尺码 -->
       <div class="param-info">
         <table v-for="(table, index) in paramInfo.sizes" :key="index" class="info-size">
-          <tr v-for="(tr, indey) in table" :key="indey">
-            <td v-for="(td, indez) in tr" :key="indez">
-              {{ td }}
-            </td>
-          </tr>
+          <tbody>
+            <tr v-for="(tr, indey) in table" :key="indey">
+              <td v-for="(td, indez) in tr" :key="indez">
+                {{ td }}
+              </td>
+            </tr>
+          </tbody>
         </table>
 
         <table class="info-param">
-          <tr v-for="(info, index) in paramInfo.infos" :key="index">
-            <td class="info-param-key">
-              {{ info.key }}
-            </td>
-            <td class="param-value">
-              {{ info.value }}
-            </td>
-          </tr>
+          <tbody>
+            <tr v-for="(info, index) in paramInfo.infos" :key="index">
+              <td class="info-param-key">
+                {{ info.key }}
+              </td>
+              <td class="param-value">
+                {{ info.value }}
+              </td>
+            </tr>
+          </tbody>
         </table>
 
         <div v-if="paramInfo.image" class="info-img">
@@ -162,19 +166,19 @@
         </van-col>
         <van-col span="14" style="margin-top:20px">
           <div class="price">
-            ￥<span style="font-size:24px;color:#f00;">{{ price / 100 }}</span>
+            <span>￥</span><span style="font-size:24px;color:#f00;">{{ price / 100 }}</span>
           </div>
           <div class="stock">
-            库存 {{ stock }}
+            <span>库存 {{ stock }}</span>
           </div>
           <div class="chooses">
-            已选择 {{ chooseColor + ' ' + chooseSize }}
+            <span>已选择 {{ chooseColor + ' ' + chooseSize }}</span>
           </div>
         </van-col>
       </van-row>
       <van-divider />
       <div class="colorTitle">
-        颜色:
+        <span>颜色:</span>
       </div>
       <div v-if="ShoppingCartInfo.props" class="colors">
         <div
@@ -189,7 +193,7 @@
       </div>
       <van-divider />
       <div class="colorTitle">
-        尺码:
+        <span>尺码:</span>
       </div>
       <div v-if="ShoppingCartInfo.props" class="colors">
         <div
@@ -205,19 +209,21 @@
       <van-divider />
       <div class="buyNum">
         <div class="buyTitle">
-          购买数量
+          <span>购买数量</span>
         </div>
         <van-stepper v-model="buyNum" integer style="margin-right:20px" />
       </div>
-      <van-button
-        round
-        type="danger"
-        size="small"
-        style="float: right;margin:10px 20px 5px 0;padding: 0 20px"
-        @click="addToCart"
-      >
-        加入购物车
-      </van-button>
+      <div class="van-sku-actions">
+        <button class="van-button van-button--warning van-button--large" @click="addToCart">
+          <div class="van-button__content">
+            <span class="van-button__text">加入购物车</span>
+          </div>
+        </button><button class="van-button van-button--danger van-button--large" @click="buyNow">
+          <div class="van-button__content">
+            <span class="van-button__text">立即购买</span>
+          </div>
+        </button>
+      </div>
     </van-popup>
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
@@ -344,11 +350,12 @@ export default {
       this.xdSkuId = result.xdSkuId
     },
     addToCart () {
-      // const flag = this.proList.every((item) => {
-      //   return item.every(v => v.id !== this.xdSkuId)
-      // })
+      const flag = this.proList.every((item) => {
+        return item.every(v => v.id !== this.xdSkuId)
+      })
       const productInfo = {
         id: this.xdSkuId,
+        shopId: this.shopInfo.shopId,
         title: this.goodsInfo.title,
         name: this.shopInfo.name,
         img: this.proImg,
@@ -360,27 +367,29 @@ export default {
         price: this.price / 100
 
       }
-      // if (flag) {
-      this.$store.commit('addProduct', productInfo)
-      this.$toast('添加购物车成功')
-      this.showSku = false
-      this.buyNum = 1
-      // console.log(productInfo)
-      // } else {
-      //   this.$store.commit('addProductNum', productInfo)
-      //   this.$toast('商品数量+' + this.buyNum)
-      //   this.showSku = false
-      //   this.buyNum = 1
-      // }
+      if (flag) {
+        this.$store.commit('addProduct', productInfo)
+        this.$toast('添加购物车成功')
+        this.showSku = false
+        this.buyNum = 1
+      } else {
+        this.$store.commit('addProductNum', productInfo)
+        this.$toast('商品数量+' + this.buyNum)
+        this.showSku = false
+        this.buyNum = 1
+      }
+    },
+    buyNow () {
+      this.$toast('该功能暂未开放')
     },
     ...mapMutations({
       addProduct: 'addProduct'
     }),
     onRefresh () {
       this.isLoading = true
-      setTimeout(() => {
+      location.reload(() => {
         this.isLoading = false
-      }, 1000)
+      })
     },
     onSelect (option) {
       this.$toast(option.name)
@@ -624,19 +633,20 @@ export default {
   }
   .colors {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     flex-wrap: wrap;
     .colorItem {
+      font-size: 15px;
       margin-top: 10px;
       margin-left: 20px;
-      // width: 100px;
       border-radius: 5px;
       background: #f5f5f5;
       padding: 2px 7px;
     }
     .active {
-    background: pink;
-    color: red;
+    opacity: 0.9;
+    background: rgb(248, 219, 224);
+    color: #ee0a24;
   }
   }
   .buyNum {

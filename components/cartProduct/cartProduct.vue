@@ -33,7 +33,7 @@
       </div>
     </div>
     <van-submit-bar v-if="isShow" :price="totalPrice" button-text="提交订单" @submit="onSubmit">
-      <van-checkbox v-model="checked" @click="checkAll">
+      <van-checkbox :value="isCheckedAll" @click="checkAll">
         全选
       </van-checkbox>
     </van-submit-bar>
@@ -47,7 +47,7 @@
         </van-button>
       </template>
       <template #title>
-        <van-checkbox v-model="checked" class="checkbox" @click="checkAll">
+        <van-checkbox :value="isCheckedAll" class="checkbox" @click="checkAll">
           全选
         </van-checkbox>
       </template>
@@ -62,13 +62,14 @@ export default {
   },
   data () {
     return {
-      checked: false,
+      checked: true,
       shopChecked: false
     }
   },
   computed: {
     ...mapGetters({
-      proList: 'proList'
+      proList: 'proList',
+      isCheckedAll: 'isCheckedAll'
     }),
     totalPrice () {
       let total = 0
@@ -80,25 +81,6 @@ export default {
         }
       }
       return total
-    }
-  },
-  watch: {
-    proList: {
-      handler (oldValue, newValue) {
-        let flag = false
-        for (const v of newValue) {
-          for (const item of v) {
-            if (!item.isChecked) {
-              flag = false
-              break
-            } else {
-              flag = true
-            }
-          }
-        }
-        this.checked = flag
-      },
-      deep: true
     }
   },
   activated () {
@@ -132,12 +114,18 @@ export default {
     },
     // 批量删除商品
     deleteSome () {
-      let flag = false
+      let flag = true
       for (let i = 0; i < this.proList.length; i++) {
-        if (!this.proList[i].isChecked) {
-          flag = true
-        } else {
-          flag = false
+        for (const v of this.proList[i]) {
+          if (v.isChecked) {
+            flag = false
+            break
+          } else {
+            flag = true
+          }
+        }
+        // 判断是否已经找到已选中的商品，已找到直接退出循环
+        if (i + 1 > i && !flag) {
           break
         }
       }
@@ -187,7 +175,7 @@ export default {
     },
     // 全选
     checkAll () {
-      this.$store.commit('updateAllChecked', this.checked)
+      this.$store.commit('updateAllChecked')
     },
     // 单一商店商品全选联动
     updateShopChecked (payload) {
@@ -195,7 +183,6 @@ export default {
     },
     // 全部商品单选联动全选
     updataInfo (item) {
-      // console.log(item)
       this.$store.commit('updateChecked', item)
       this.checked = this.proList.every(item => item.isChecked)
     }
