@@ -5,10 +5,11 @@
         <div class="proListItem">
           <div v-if="proItem[0]" class="shop">
             <van-checkbox :value="proItem[0].isShopChecked" icon-size="16px" @click="updateShopChecked(proItem[0])" />
-            <span>{{ proItem[0].name }}</span>
-            <van-icon name="arrow" />
+            <van-image :src="proItem[0].logo" round width="30" height="30" />
+            <span style="line-height:30px">{{ proItem[0].name }}</span>
+            <van-icon name="arrow" style="line-height:30px" />
           </div>
-          <div v-for="(item,i) in proItem" :key="i" class="productInfo">
+          <div v-for="(item,i) in proItem" :key="i" class="productInfo" @click="goToProduct(item.iid)">
             <van-checkbox :value="item.isChecked" icon-size="16px" @click="updataInfo(item)" />
             <van-swipe-cell>
               <van-card
@@ -91,6 +92,10 @@ export default {
     ...mapMutations({
       updataProduct: 'updataProduct'
     }),
+    // 跳转回商品详情页
+    goToProduct (iid) {
+      this.$router.push({ name: 'detail-id', params: { id: iid } })
+    },
     onSubmit () {
       this.$toast('该功能暂未开放')
     },
@@ -194,10 +199,7 @@ export default {
     margin: 10px 0;
     display: flex;
     justify-content: flex-start;
-    .van-checkbox {
-        margin-left: 10px;
-    }
-    span {
+    .van-checkbox, span, .van-image {
         margin-left: 10px;
     }
 }

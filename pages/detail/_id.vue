@@ -8,7 +8,8 @@
       <!-- tabBar -->
       <van-nav-bar fixed :title="goodsInfo.title">
         <template #left>
-          <van-icon name="arrow-left" color="#000" size="18px" @click="back" />
+          <van-icon name="arrow-left" color="#333" size="20" @click="$router.go(-1)" />
+          <van-icon name="wap-home-o" color="#333" size="20" style="margin-left:5px;" @click="$router.push('/')" />
         </template>
         <template #right>
           <van-icon name="ellipsis" color="#000" size="25px" @click="showShare=true" />
@@ -211,7 +212,8 @@
         <div class="buyTitle">
           <span>购买数量</span>
         </div>
-        <van-stepper v-model="buyNum" integer style="margin-right:20px" />
+        <span style="color:#ee0a24;font-size:14px">每人限购5件</span>
+        <van-stepper v-model="buyNum" integer style="margin-right:20px" max="5" />
       </div>
       <div class="van-sku-actions">
         <button class="van-button van-button--warning van-button--large" @click="addToCart">
@@ -228,7 +230,12 @@
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
       <van-goods-action-icon icon="cart-o" text="购物车" to="/cart" :badge="$store.state.proList.length" />
-      <van-goods-action-icon icon="star-o" text="收藏" />
+      <van-goods-action-icon
+        :icon="isCollected ? 'star' : 'star-o'"
+        :text="isCollected ? '已收藏' : '收藏'"
+        :color="isCollected ? '#ff5000' : '#000'"
+        @click="collectProduction"
+      />
       <van-goods-action-button type="warning" text="加入购物车" @click="showSku = true" />
       <van-goods-action-button type="danger" text="立即购买" @click="showSku = true" />
     </van-goods-action>
@@ -280,6 +287,7 @@ export default {
       chooseColor: '',
       chooseSize: '',
       buyNum: 1,
+      isCollected: false,
       options: [
         { name: '微信', icon: 'wechat' },
         { name: '微博', icon: 'weibo' },
@@ -312,7 +320,7 @@ export default {
       this.styleId = this.ShoppingCartInfo.props[0].list[0].styleId
       this.sizeId = this.ShoppingCartInfo.props[1].list[0].sizeId
       this.stock = this.ShoppingCartInfo.skus[0].stock
-      this.price = this.ShoppingCartInfo.skus[0].price
+      this.price = this.ShoppingCartInfo.skus[0].nowprice
       this.proImg = this.ShoppingCartInfo.skus[0].img
       // 详情数据
       this.detailInfo = data.detailInfo || {}
@@ -336,7 +344,7 @@ export default {
       const result = this.ShoppingCartInfo.skus.find(item => item.styleId === this.styleId && item.sizeId === this.sizeId)
       this.proImg = result.img
       this.stock = result.stock
-      this.price = result.price
+      this.price = result.nowprice
       this.xdSkuId = result.xdSkuId
     },
     changeSize (index, item) {
@@ -346,16 +354,39 @@ export default {
       const result = this.ShoppingCartInfo.skus.find(item => item.styleId === this.styleId && item.sizeId === this.sizeId)
       this.proImg = result.img
       this.stock = result.stock
-      this.price = result.price
+      this.price = result.nowprice
       this.xdSkuId = result.xdSkuId
     },
+    collectProduction () {
+      const collectProduct = {
+        id: this.xdSkuId,
+        iid: this.id,
+        imgUrl: this.proImg,
+        price: this.price
+      }
+      this.isCollected = !this.isCollected
+      if (!this.isCollected) {
+        this.$toast('取消收藏')
+        this.$store.commit('collection/deCollectProduct', collectProduct)
+      } else {
+        this.$store.commit('collection/addCollectProduct', collectProduct)
+        this.$toast('收藏成功!')
+      }
+    },
     addToCart () {
+      // 处理库存不足的情况
+      if (!this.stock) {
+        this.$toast('当前商品被抢光了,请选择其他规格')
+        return
+      }
       const flag = this.proList.every((item) => {
         return item.every(v => v.id !== this.xdSkuId)
       })
       const productInfo = {
         id: this.xdSkuId,
+        iid: this.id,
         shopId: this.shopInfo.shopId,
+        logo: this.shopInfo.logo,
         title: this.goodsInfo.title,
         name: this.shopInfo.name,
         img: this.proImg,
@@ -373,6 +404,17 @@ export default {
         this.showSku = false
         this.buyNum = 1
       } else {
+        // 处理限购件数
+        for (const v of this.proList) {
+          for (const item of v) {
+            if (item.id === productInfo.id && (item.num + productInfo.num) > 5) {
+              this.$toast('每人限购5件!')
+              this.showSku = false
+              this.buyNum = 1
+              return
+            }
+          }
+        }
         this.$store.commit('addProductNum', productInfo)
         this.$toast('商品数量+' + this.buyNum)
         this.showSku = false
@@ -394,9 +436,6 @@ export default {
     onSelect (option) {
       this.$toast(option.name)
       this.showShare = false
-    },
-    back () {
-      this.$router.go(-1)
     },
     clickTitle (index) {
       this.currentTitle = index
@@ -652,6 +691,7 @@ export default {
   .buyNum {
     display: flex;
     justify-content: space-between;
+    line-height: 28px;
   }
   .van-popup {
     .stock,.chooses {

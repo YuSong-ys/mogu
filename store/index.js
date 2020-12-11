@@ -55,7 +55,9 @@ export const mutations = {
         break
       }
     }
-    sameProduct.num += payload.num
+    if ((sameProduct.num + payload.num) <= 5) {
+      sameProduct.num += payload.num
+    }
   },
 
   // 减少商品数量

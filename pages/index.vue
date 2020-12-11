@@ -3,7 +3,7 @@
     <van-nav-bar
       title="购物街"
     />
-    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+    <van-swipe class="my-swipe" :autoplay="3000" initial-swipe="3" indicator-color="white">
       <van-swipe-item v-for="(item,index) in banner" :key="index">
         <a :href="item.link">
           <van-image :src="item.image" :alt="item.title" :height="195" :width="375" />
