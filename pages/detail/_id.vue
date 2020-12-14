@@ -376,7 +376,7 @@ export default {
     addToCart () {
       // 处理库存不足的情况
       if (!this.stock) {
-        this.$toast('当前商品被抢光了,请选择其他规格')
+        this.$toast('当前商品被抢光了,看看其他规格吧')
         return
       }
       const flag = this.proList.every((item) => {
@@ -433,8 +433,12 @@ export default {
         size: this.chooseSize,
         price: this.price / 100
       }]]
-      this.showSku = false
-      this.$router.push({ name: 'order', query: orderInfo })
+      if (this.stock) {
+        this.showSku = false
+        this.$router.push({ name: 'order', query: orderInfo })
+      } else {
+        this.$toast('当前商品被抢光了,看看其他规格吧')
+      }
     },
     ...mapMutations({
       addProduct: 'addProduct'

@@ -135,7 +135,7 @@ export default {
         }
       }
       .addressInfo {
-        margin-top: 10px;
+        margin-top: 15px;
         width: 75%;
         .addressDetail {
           margin-top: 5px;

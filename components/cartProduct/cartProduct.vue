@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <van-submit-bar v-if="isShow" :price="totalPrice" button-text="提交订单" @submit="onSubmit">
+    <van-submit-bar v-if="isShow" :price="totalPrice" button-text="结算" @submit="onSubmit">
       <van-checkbox :value="isCheckedAll" @click="checkAll">
         全选
       </van-checkbox>

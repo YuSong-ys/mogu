@@ -17,10 +17,10 @@
       <div class="orderInfo">
         <van-cell title="我的订单" value="全部订单" size="large" is-link to="order/list" />
         <van-grid>
-          <van-grid-item icon="pending-payment" text="待付款" />
-          <van-grid-item icon="send-gift-o" text="待发货" />
-          <van-grid-item icon="logistics" text="待收货" />
-          <van-grid-item icon="other-pay" text="评价" />
+          <van-grid-item icon="pending-payment" text="待付款" @click="goToOrder(1)" />
+          <van-grid-item icon="send-gift-o" text="待发货" @click="goToOrder(2)" />
+          <van-grid-item icon="logistics" text="待收货" @click="goToOrder(3)" />
+          <van-grid-item icon="other-pay" text="评价" @click="goToOrder(4)" />
         </van-grid>
       </div>
       <div class="connectionInfo">
@@ -72,6 +72,9 @@ export default {
     })
   },
   methods: {
+    goToOrder (index) {
+      this.$router.push({ name: 'order-list', params: { active: index } })
+    },
     goToSetting () {
       this.$router.push({ name: 'personal-setting' })
     },
