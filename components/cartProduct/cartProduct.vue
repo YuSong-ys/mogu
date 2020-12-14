@@ -9,7 +9,7 @@
             <span style="line-height:30px">{{ proItem[0].name }}</span>
             <van-icon name="arrow" style="line-height:30px" />
           </div>
-          <div v-for="(item,i) in proItem" :key="i" class="productInfo" @click="goToProduct(item.iid)">
+          <div v-for="(item,i) in proItem" :key="i" class="productInfo">
             <van-checkbox :value="item.isChecked" icon-size="16px" @click="updataInfo(item)" />
             <van-swipe-cell>
               <van-card
@@ -92,21 +92,35 @@ export default {
     ...mapMutations({
       updataProduct: 'updataProduct'
     }),
-    // 跳转回商品详情页
-    goToProduct (iid) {
-      this.$router.push({ name: 'detail-id', params: { id: iid } })
-    },
     onSubmit () {
-      this.$toast('该功能暂未开放')
+      // 去除未选中的商品
+      const orderInfo = this.proList.map((v) => {
+        const arr = v.filter(item => item.isChecked)
+        if (arr.length) {
+          return arr
+        }
+      })
+      // 去除undefined
+      for (let i = 0; i < orderInfo.length; i++) {
+        if (!orderInfo[i]) {
+          orderInfo.splice(i, 1)
+          i--
+        }
+      }
+      if (orderInfo.length) {
+        this.$router.push({ name: 'order', query: orderInfo })
+      } else {
+        this.$toast('您还未选择商品')
+      }
     },
     // 商品增加
     addNum (item) {
-      this.$store.commit('addProductNum', item)
+      this.$store.commit('addProductNum', { id: item.id, num: 1 })
     },
     // 商品减少
     deNum (item) {
       if (item.num > 1) {
-        this.$store.commit('deProductNum', item)
+        this.$store.commit('deProductNum', { id: item.id, num: 1 })
       }
     },
     // 删除商品

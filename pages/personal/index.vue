@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="orderInfo">
-        <van-cell title="我的订单" value="全部订单" size="large" is-link />
+        <van-cell title="我的订单" value="全部订单" size="large" is-link to="order/list" />
         <van-grid>
           <van-grid-item icon="pending-payment" text="待付款" />
           <van-grid-item icon="send-gift-o" text="待发货" />
@@ -44,7 +44,7 @@
         <van-cell title="我的收藏" size="large" />
         <div v-if="collectionList.length" class="collectionItem">
           <div v-for="(item,index) in collectionList" :key="index" class="subItem" @click="goToProduct(item.iid)">
-            <van-image :src="item.imgUrl" width="70" height="70" />
+            <img :src="item.imgUrl">
             <span class="itemPrice">￥<span style="font-size:16px;">{{ item.price / 100 }}</span></span>
           </div>
         </div>
@@ -152,6 +152,11 @@ export default {
           background: #f7f8fa;
           color:#ee0a24;
           font-size:12px;
+          img {
+            width: 70px;
+            height: 70px;
+            border-radius: 5px;
+          }
           .itemPrice {
             margin: 5px 10px 5px 0;
           }

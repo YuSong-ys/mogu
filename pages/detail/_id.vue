@@ -422,7 +422,19 @@ export default {
       }
     },
     buyNow () {
-      this.$toast('该功能暂未开放')
+      const orderInfo = [[{
+        iid: this.id,
+        logo: this.shopInfo.logo,
+        title: this.goodsInfo.title,
+        name: this.shopInfo.name,
+        img: this.proImg,
+        num: this.buyNum,
+        style: this.chooseColor,
+        size: this.chooseSize,
+        price: this.price / 100
+      }]]
+      this.showSku = false
+      this.$router.push({ name: 'order', query: orderInfo })
     },
     ...mapMutations({
       addProduct: 'addProduct'
