@@ -25,6 +25,11 @@ export default {
     if (this.$route.params) {
       this.active = this.$route.params.active
     }
+  },
+  head () {
+    return {
+      title: '订单列表'
+    }
   }
 }
 </script>

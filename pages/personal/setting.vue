@@ -4,7 +4,7 @@
       title="设置"
     >
       <template #left>
-        <van-icon name="arrow-left" color="#333" size="20" @click="$router.go(-1)" />
+        <van-icon name="arrow-left" color="#333" size="20" @click="backPersonal" />
         <van-icon name="wap-home-o" color="#333" size="20" style="margin-left:10px;" @click="$router.push('/')" />
       </template>
     </van-nav-bar>
@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="address">
-      <van-cell title="地址管理" is-link />
+      <van-cell title="地址管理" is-link to="/personal/address" />
     </div>
     <div class="others">
       <van-cell-group>
@@ -42,8 +42,16 @@
 <script>
 export default {
   methods: {
+    backPersonal () {
+      this.$router.push('/personal')
+    },
     logout () {
       this.$toast('退出登录')
+    }
+  },
+  head () {
+    return {
+      title: '设置'
     }
   }
 }

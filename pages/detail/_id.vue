@@ -8,7 +8,7 @@
       <!-- tabBar -->
       <van-nav-bar fixed :title="goodsInfo.title">
         <template #left>
-          <van-icon name="arrow-left" color="#333" size="20" @click="$router.go(-1)" />
+          <van-icon name="arrow-left" color="#333" size="20" @click="$router.push('/')" />
           <van-icon name="wap-home-o" color="#333" size="20" style="margin-left:5px;" @click="$router.push('/')" />
         </template>
         <template #right>

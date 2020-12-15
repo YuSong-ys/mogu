@@ -6,17 +6,17 @@
       </template>
     </van-nav-bar>
     <div class="content">
-      <div class="address">
+      <div class="address" @click="goToAddress">
         <div class="addressIcon">
           <van-icon name="location" color="#f00" size="26" />
         </div>
-        <div class="addressInfo">
+        <div v-if="addressInfo" class="addressInfo">
           <div class="userInfo">
-            <span>测试昵称</span>
-            <span style="font-size:14px;color:#999">155****8892</span>
+            <span>{{ addressInfo.name }}</span>
+            <span style="font-size:14px;color:#999">{{ addressInfo.tel }}</span>
           </div>
           <div class="addressDetail">
-            四川省成都市双流区成都国际节能大厦3501
+            {{ addressInfo.address }}
           </div>
         </div>
         <van-icon name="arrow" style="line-height:80px;margin-left:20px;" color="#999" />
@@ -67,6 +67,7 @@ export default {
     return {
       // 订单备注
       value: '',
+      addressInfo: {},
       orderInfo: []
     }
   },
@@ -99,15 +100,20 @@ export default {
       }
     }
   },
-  created () {
-    this.orderInfo = this.$route.query
-  },
   activated () {
-    this.orderInfo = this.$route.query
+    if (Array.isArray(this.$route.query)) {
+      this.orderInfo = this.$route.query
+      this.addressInfo = this.$store.state.address.addressList.filter(item => item.isDefault)[0]
+    } else {
+      this.addressInfo = this.$route.query
+    }
   },
   methods: {
+    goToAddress () {
+      this.$router.push({ name: 'personal-address', query: { isOrder: true } })
+    },
     chancelOrder () {
-      this.$router.go(-1)
+      this.$router.push({ name: 'detail-id', params: { id: this.orderInfo[0][0].iid } })
     }
   }
 }
