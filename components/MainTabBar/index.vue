@@ -6,7 +6,7 @@
       </van-tabbar-item>
       <van-tabbar-item icon="orders-o" to="/category">
         分类
-      </van-tabbar-item><van-tabbar-item icon="cart-o" to="/cart">
+      </van-tabbar-item><van-tabbar-item icon="cart-o" :badge="proListLength" to="/cart">
         购物车
       </van-tabbar-item>
       <van-tabbar-item icon="user-o" to="/personal">
@@ -17,12 +17,18 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'MainTabBar',
   data () {
     return {
       active: 0
     }
+  },
+  computed: {
+    ...mapGetters({
+      proListLength: 'proListLength'
+    })
   }
 }
 </script>

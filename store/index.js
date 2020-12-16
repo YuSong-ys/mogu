@@ -194,5 +194,12 @@ export const mutations = {
 }
 export const getters = {
   proList: state => state.proList,
-  isCheckedAll: state => state.isCheckedAll
+  isCheckedAll: state => state.isCheckedAll,
+  proListLength: (state) => {
+    let proListLen = 0
+    for (let i = 0; i < state.proList.length; i++) {
+      proListLen += state.proList[i].length
+    }
+    return proListLen
+  }
 }

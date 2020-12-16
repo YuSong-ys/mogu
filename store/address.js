@@ -11,7 +11,7 @@ export const state = () => ({
       country: '',
       county: '双流区',
       isDefault: true,
-      name: 'S Smith',
+      name: '禹敢敢',
       postalCode: '638600',
       province: '四川省',
       tel: '19999999999'
@@ -62,6 +62,17 @@ export const mutations = {
     } else {
       state.addressList.splice(index, 1, payload)
     }
+  },
+
+  // 修改默认地址
+  changeDefault (state, payload) {
+    const index = state.addressList.findIndex(item => item.id === payload.id)
+    for (let i = 0; i < state.addressList.length; i++) {
+      state.addressList[i].isDefault = false
+    }
+    state.addressList.splice(index, 1)
+    payload.isDefault = true
+    state.addressList.unshift(payload)
   },
 
   // 删除地址

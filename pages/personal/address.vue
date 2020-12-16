@@ -23,19 +23,30 @@ export default {
     return {
       list: [],
       chosenAddressId: '1',
-      title: '地址列表'
+      title: '地址列表',
+      fromWhere: ''
     }
   },
   computed: {
     ...mapGetters({
       addressList: 'address/addressList'
-    //   chosenAddressId: 'address/chosenAddressId'
     })
   },
+
+  beforeRouteEnter (to, from, next) {
+    next((vm) => {
+      // 之所以要存personal-setting是因为从order进入后formWhere不会发生改变，再从setting进入还是走的order的逻辑
+      if (from.name === 'order' || from.name === 'personal-setting') {
+        vm.formWhere = from.name
+      }
+    })
+  },
+
   methods: {
     backSeeting () {
-      if (this.$route.query.isOrder) {
-        this.$router.go(-1)
+      if (this.formWhere === 'order') {
+        const address = this.$store.state.address.addressList.find(item => item.id === this.chosenAddressId)
+        this.$router.push({ name: 'order', query: address })
       } else {
         this.$router.push('/personal/setting')
       }
@@ -44,8 +55,10 @@ export default {
       this.$router.push('/personal/addAddress')
     },
     chooseAddress (item) {
-      if (this.$route.query.isOrder) {
+      if (this.formWhere === 'order') {
         this.$router.push({ name: 'order', query: item })
+      } else {
+        this.$store.commit('address/changeDefault', item)
       }
     },
     onEdit (item, index) {

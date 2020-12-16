@@ -10,7 +10,7 @@
         <div class="addressIcon">
           <van-icon name="location" color="#f00" size="26" />
         </div>
-        <div v-if="addressInfo" class="addressInfo">
+        <div v-if="addressInfo.id" class="addressInfo">
           <div class="userInfo">
             <span>{{ addressInfo.name }}</span>
             <span style="font-size:14px;color:#999">{{ addressInfo.tel }}</span>
@@ -18,6 +18,9 @@
           <div class="addressDetail">
             {{ addressInfo.address }}
           </div>
+        </div>
+        <div v-else class="addAddress">
+          <span>添加收货地址</span>
         </div>
         <van-icon name="arrow" style="line-height:80px;margin-left:20px;" color="#999" />
       </div>
@@ -68,7 +71,9 @@ export default {
       // 订单备注
       value: '',
       addressInfo: {},
-      orderInfo: []
+      orderInfo: [],
+      formWhere: '',
+      toWhere: ''
     }
   },
   computed: {
@@ -100,6 +105,15 @@ export default {
       }
     }
   },
+
+  beforeRouteEnter (to, from, next) {
+    next((vm) => {
+      if (from.name !== 'personal-address') {
+        vm.formWhere = from.name
+      }
+    })
+  },
+
   activated () {
     if (Array.isArray(this.$route.query)) {
       this.orderInfo = this.$route.query
@@ -110,10 +124,14 @@ export default {
   },
   methods: {
     goToAddress () {
-      this.$router.push({ name: 'personal-address', query: { isOrder: true } })
+      this.$router.push({ name: 'personal-address' })
     },
     chancelOrder () {
-      this.$router.push({ name: 'detail-id', params: { id: this.orderInfo[0][0].iid } })
+      if (this.formWhere === 'detail-id') {
+        this.$router.push({ name: 'detail-id', params: { id: this.orderInfo[0][0].iid } })
+      } else {
+        this.$router.push('/cart')
+      }
     }
   }
 }
@@ -147,6 +165,10 @@ export default {
           margin-top: 5px;
           font-size: 14px;
         }
+      }
+      .addAddress {
+        line-height: 80px;
+        width: 75%;
       }
     }
     .goods {

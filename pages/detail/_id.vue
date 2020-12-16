@@ -229,7 +229,7 @@
     </van-popup>
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" />
-      <van-goods-action-icon icon="cart-o" text="购物车" to="/cart" :badge="$store.state.proList.length" />
+      <van-goods-action-icon icon="cart-o" text="购物车" to="/cart" :badge="proListLength" />
       <van-goods-action-icon
         :icon="isCollected ? 'star' : 'star-o'"
         :text="isCollected ? '已收藏' : '收藏'"
@@ -299,7 +299,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      proList: 'proList'
+      proList: 'proList',
+      proListLength: 'proListLength'
     })
   },
   created () {
