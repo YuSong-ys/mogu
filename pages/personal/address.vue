@@ -57,8 +57,6 @@ export default {
     chooseAddress (item) {
       if (this.formWhere === 'order') {
         this.$router.push({ name: 'order', query: item })
-      } else {
-        this.$store.commit('address/changeDefault', item)
       }
     },
     onEdit (item, index) {
@@ -76,5 +74,8 @@ export default {
 <style lang="scss" scoped>
 .van-address-list__bottom {
     bottom: 15px;
+}
+/deep/ .van-radio__icon {
+  display: none;
 }
 </style>
