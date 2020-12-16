@@ -55,14 +55,16 @@ export default {
       } else {
         this.$store.commit('address/editAddreee', content)
       }
-      this.$router.push('/personal/address')
-      this.addressInfo = {}
-    },
-    backAddress () {
-      this.$router.go(-1)
       this.addressInfo = {}
       this.showDelete = false
       this.title = '新增地址'
+      this.$router.push('/personal/address')
+    },
+    backAddress () {
+      this.addressInfo = {}
+      this.showDelete = false
+      this.title = '新增地址'
+      this.$router.go(-1)
     },
     onDelete (content) {
       this.$store.commit('address/deleteAddress', content)
