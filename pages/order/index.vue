@@ -60,6 +60,7 @@
       :price="totalPrice"
       button-text="提交订单"
       tip-icon="info-o"
+      @submit="onSubmit"
     />
   </div>
 </template>
@@ -123,6 +124,9 @@ export default {
     }
   },
   methods: {
+    onSubmit () {
+      this.$toast('该功能暂未开放')
+    },
     goToAddress () {
       this.$router.push({ name: 'personal-address' })
     },

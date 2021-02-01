@@ -19,7 +19,7 @@
         />
       </div>
       <div class="userInfo">
-        <span class="userName">测试昵称</span>
+        <span class="userName">禹敢敢</span>
         <span class="userTel">155****8892</span>
       </div>
     </div>

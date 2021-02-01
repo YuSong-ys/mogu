@@ -9,7 +9,7 @@
           height="4rem"
           src="https://img.yzcdn.cn/vant/cat.jpeg"
         />
-        <span class="userName">测试昵称</span>
+        <span class="userName">禹敢敢</span>
         <div class="setting" @click="goToSetting">
           <van-icon name="setting" size="24" />
         </div>
